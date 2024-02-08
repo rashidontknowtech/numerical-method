@@ -95,6 +95,52 @@ quiver(X,Y,px,py)
 % Newtons method
 
 % Hessian 
+% Bard's corrected code
+% ... % previous code unchanged
+
+%---------------------------------------------------------------
+% Find minimum
+% Newtons method
+% Hessian 
+xvec = 0:5:180;
+yvec = 0:5:180;
+[X,Y] = meshgrid(xvec,yvec);
+fx = @(X,Y) (cosd(X).^2 + cosd(Y).^2).^2;
+Z = fx(X,Y);
+for ii=2:length(xvec)-1
+    for jj=2:length(yvec)-1
+        % Corrected calculations for second-order partial derivatives
+        d2fdx2 = (Z(ii+1,jj) - 2*Z(ii,jj) + Z(ii-1,jj)) / (delx^2);
+        d2fdy2 = (Z(ii,jj+1) - 2*Z(ii,jj) + Z(ii,jj-1)) / (dely^2);
+        d2fdxdy = (Z(ii+1,jj+1) - Z(ii+1,jj-1) - Z(ii-1,jj+1) + Z(ii-1,jj-1)) / (4*delx*dely);
+        d2fdydx = d2fdxdy; % Due to symmetry
+    end
+end
+
+% Initial guess
+x = 100;
+y = 100;
+for ii = 1:100
+    Gh = [dfdx(x(ii),y(ii)) dfdy(x(ii),y(ii))];
+    
+    % second order partial derivative matrix 
+    K = [d2fdx2(x(ii),y(ii)) d2fdxdy(x(ii),y(ii)); 
+        d2fdydx(x(ii),y(ii)) d2fdy2(x(ii),y(ii))];
+        
+    % Hessian gives the direction of descent
+    H = (Gh'*Gh)+K*fx(x(ii),y(ii)); 
+    
+    dm = -inv(H) * Gh' * fx(x(ii),y(ii));
+    
+    % Model update
+    x(ii+1) = x(ii) + dm(1);
+    y(ii+1) = y(ii) + dm(2);
+end
+figure(1)
+hold on
+plot3(x,y,fx(x,y),'o-k','LineWidth',2)
+quiver(X,Y,px,py)
+
 d2fdx2 =(Z(ii+1,jj)+z(ii-1,jj)- 2.*Z(ii,jj))/(delx).^2;
 d2fdy2 =(Z(ii,jj+1)+z(ii,jj-1)- 2.*Z(ii,jj))/(dely).^2;
 d2fdxdy =(Z(ii+1,jj+1)-z(ii+1,jj-1)- Z(ii-1,jj+1)-Z(ii-1,jj-1))/4.^delx*dely;
