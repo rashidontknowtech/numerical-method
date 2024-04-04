@@ -1,0 +1,21 @@
+v=[2 1];
+
+figure;
+quiver (0,0,v(1),v(2),0) ;
+xlabel('X');
+ylabel('Y');
+title('2D vector plot');
+G=[1 ;3];
+b=G*v;
+hold on
+plot(0,0,b(1),b(2),'-');
+
+%calculating svd
+[U,S,V]=svd(G);
+
+Vt=V'*v;
+plot(0,0,Vt(1),Vt(2),0,'-');
+SVt=S*Vt;
+plot(0,0,SVt(1),SVt(2),0,'-');
+d=U*SVt;
+plot(0,0,d(1),d(2),0,'-');
